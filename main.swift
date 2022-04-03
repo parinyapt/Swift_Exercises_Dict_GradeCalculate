@@ -7,13 +7,11 @@ var grade:[String:String] = [:]
 var config_stdnumber:Int = 0
 var menu_select:Int = 0
 var use_status:Bool = true
+var max_str:Int = 5
 
-// var temp_number:Float = 0
 var temp_text:String = ""
 var temp_status:Bool = false
-
 var temp_count:Int = 1
-var max_str:Int = 5
 var temp_name:String = ""
 
 repeat{
@@ -56,7 +54,7 @@ repeat{
   }else if(menu_select == 2){
   //menu 2 begin 
     if data.count < config_stdnumber {
-      temp_count = 1
+      temp_count = data.count + 1
       while(temp_count <= config_stdnumber) {
         print("---- ข้อมูลนักเรียนคนที่ \(temp_count) ----")
         
@@ -147,15 +145,59 @@ repeat{
   //menu 3 end
   }else if(menu_select == 4){
   //menu 4 begin
-    
+    if data.count > 0 {
+      temp_name = ""
+      repeat {
+        temp_status = false
+        print("ระบุชื่อนักเรียนที่ต้องการค้นหา : ",terminator: "")
+        temp_text = readLine()!
+        if Int(temp_text) == nil && Float(temp_text) == nil && temp_text != "" {
+          if(data[temp_text] != nil) {
+            temp_name = temp_text
+            temp_status = true
+          }else{
+            print("แจ้งเตือน! -> ไม่พบข้อมูลนักเรียนที่ต้องการค้นหา โปรดลองใหม่อีกครั้ง")
+          }
+        }
+      }while(temp_status == false)
+      print("\("Name".withCString { String(format: "%-"+String(max_str)+"s", $0) }) | Test1 | Test2 | Test3 | Total | Grade")
+      print("\(temp_name.withCString { String(format: "%-"+String(max_str)+"s", $0) })  \(String(format: "%6.2f", data[temp_name]!["score1"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", data[temp_name]!["score2"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", data[temp_name]!["score3"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", data[temp_name]!["total"] ?? "ไม่พบข้อมูล")) \t\(grade[temp_name] ?? "ยังไม่ประมวลผล")")
+    }else{
+      print("แจ้งเตือน! -> โปรดกรอกข้อมูลนักเรียนอย่างน้อย 1 คนเพื่อค้นหาข้อมูล")
+    }
   //menu 4 end
   }else if(menu_select == 5){
   //menu 5 begin
-    
+    if data.count > 0 {
+      let max = data.max { a, b in a.value["total"]! < b.value["total"]! }
+      let min = data.min { a, b in a.value["total"]! < b.value["total"]! }
+      
+      print("== สูงสุด ==\n\("Name".withCString { String(format: "%-"+String(max_str)+"s", $0) }) | Test1 | Test2 | Test3 | Total | Grade")
+      temp_text = max?.key ?? "-"
+      print("\(temp_text.withCString { String(format: "%-"+String(max_str)+"s", $0) })  \(String(format: "%6.2f", max?.value["score1"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", max?.value["score2"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", max?.value["score3"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", max?.value["total"] ?? "ไม่พบข้อมูล")) \t\(grade[temp_text] ?? "ยังไม่ประมวลผล")")
+      
+      print("== ต่ำสุด ==\n\("Name".withCString { String(format: "%-"+String(max_str)+"s", $0) }) | Test1 | Test2 | Test3 | Total | Grade")
+      temp_text = min?.key ?? "-"
+      print("\(temp_text.withCString { String(format: "%-"+String(max_str)+"s", $0) })  \(String(format: "%6.2f", min?.value["score1"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", min?.value["score2"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", min?.value["score3"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", min?.value["total"] ?? "ไม่พบข้อมูล")) \t\(grade[temp_text] ?? "ยังไม่ประมวลผล")")
+    }else{
+      print("แจ้งเตือน! -> โปรดกรอกข้อมูลนักเรียนอย่างน้อย 1 คนเพื่อแสดงรายชื่อผู้ที่ได้คะแนนสูงสุดและต่ำสุด")
+    }
   //menu 5 end
   }else if(menu_select == 6){
   //menu 6 begin 
-    
+    if data.count > 0 {
+      let sortedData = data.sorted {
+        return $0.value["total"]! > $1.value["total"]!
+      }
+      print("\nNo. | \("Name".withCString { String(format: "%-"+String(max_str)+"s", $0) }) | Test1 | Test2 | Test3 | Total | Grade")
+      for (index, data) in sortedData.enumerated() {
+        // print(data.key)
+        temp_text = data.key
+        print("\(String(format: "%2d", (index+1))) \t  \(temp_text.withCString { String(format: "%-"+String(max_str)+"s", $0) })  \(String(format: "%6.2f", data.value["score1"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", data.value["score2"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", data.value["score3"] ?? "ไม่พบข้อมูล")) \(String(format: "%7.2f", data.value["total"] ?? "ไม่พบข้อมูล")) \t\(grade[temp_text] ?? "ยังไม่ประมวลผล")")
+      }
+    }else{
+      print("แจ้งเตือน! -> โปรดกรอกข้อมูลนักเรียนอย่างน้อย 1 คนเพื่อแสดงข้อมูลทั้งหมด")
+    }
   //menu 6 end 
   }else if(menu_select == 7){
   //menu 7 begin 
